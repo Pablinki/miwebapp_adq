@@ -1,0 +1,201 @@
+/* Reset básico para quitar márgenes y padding por defecto */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Centrar todo en la página */
+body {
+    background-color: #f4f4f4;
+    text-align: center;
+    padding-top: 50px;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+/* Estilo del formulario */
+#searchContainer {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Alinear el formulario */
+#searchForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Caja de entrada del contrato */
+#searchForm input[type="text"] {
+    width: 60%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Botones estilizados */
+#searchForm button {
+    width: 40%;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+#searchForm button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+}
+
+#searchForm button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+#searchForm button[type="button"] {
+    background-color: #dc3545;
+    color: white;
+}
+
+#searchForm button[type="button"]:hover {
+    background-color: #a71d2a;
+}
+
+/* Estilo para los resultados */
+.result-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    text-align: left;
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Titulos dentro de los resultados */
+.result-container h2, h3 {
+    color: #333;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+/* Listado de datos */
+.result-container ul {
+    list-style: none;
+    padding: 0;
+}
+
+.result-container li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.result-container li:last-child {
+    border-bottom: none;
+}
+
+/* Destacar etiquetas importantes */
+.result-container strong {
+    color: #007bff;
+}
+
+/* Botón "Ver Detalles del Contrato" */
+.details-button {
+    display: block;
+    width: 60%;
+    text-align: center;
+    padding: 12px;
+    margin-top: 10px;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s ease-in-out;
+}
+
+.details-button:hover {
+    background-color: #218838;
+}
+
+/* Sección de detalles ocultos */
+.hidden-section {
+    display: none;
+    background-color: #e8f0fe;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Contenedor del destinatario */
+#destinatarioContainer {
+    margin-top: 20px; /* Espacio superior */
+    text-align: center;
+}
+
+/* Nombre del destinatario */
+#destinatarioInfo {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px; /* Espacio con respecto al cargo */
+}
+
+/* Cargo del destinatario */
+#cargoInfo {
+    font-size: 16px;
+    font-style: italic;
+    color: #555;
+    margin-bottom: 20px; /* Espacio con respecto a los botones */
+}
+
+/* Botones de generación de oficios */
+#generarOficioButtons {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Espacio entre botones */
+    margin-top: 15px;
+}
+
+/* Estilo general para los botones */
+#generarOficioButtons button {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Botón de Generar Oficio Firma Adm */
+#generarOficioFirma {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Botón de Generar Oficio Póliza */
+#generarOficioPoliza {
+    background-color: #28a745;
+    color: white;
+}
+
+.sin-bullets {
+    list-style: none; /* Elimina los bullets */
+    padding: 0; /* Elimina el espacio izquierdo adicional */
+    margin: 0; /* Asegura que no haya margen extra */

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Contratos</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'contratos/styles.css' %}">
+    <script src="{% static 'js/script.js' %}" defer></script>  
+</head>
+<body>
+
+    {% if resultados %}
+    <h2>Resultados de la Búsqueda por Proveedor</h2>
+    <ul>
+        {% for contrato in resultados %}
+            <li>
+                <strong>Contrato:</strong> {{ contrato.contrato }} <br>
+                <strong>Proveedor:</strong> {{ contrato.proveedor }} <br>
+                <strong>Descripción:</strong> {{ contrato.descripcion }} <br>
+                <a href="{% url 'buscar_contrato' %}?contrato={{ contrato.contrato }}">
+                    <button>Ver Detalles</button>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No se encontraron contratos para este proveedor.</p>
+{% endif %}
+
+</body>
+</html>
