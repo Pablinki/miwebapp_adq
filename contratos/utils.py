@@ -6,11 +6,12 @@ from datetime import datetime
 import re
 from rapidfuzz import process, fuzz
 
-EXCEL_FILE_PATH = "C:\\Users\\juan.franco\\miwebapp\\excel_reader\\BASE CONTRATOS - 2025.01.23.xlsx"
+
+ruta_excel = settings.EXCEL_FILE_PATH
 
 # Ruta de la carpeta donde se generarán los documentos
-MEDIA_PATH = os.path.join(settings.MEDIA_ROOT, "DocsGenerados")
 
+ruta_docs = settings.MEDIA_PATH
 
 
 # Diccionario para traducir nombres de meses al español
@@ -48,7 +49,7 @@ def obtener_fecha_hoy():
 def obtener_destinatarios():
     """Lee la hoja 'Destinatarios' del Excel y devuelve una lista de destinatarios."""
     try:
-        df = pd.read_excel(EXCEL_FILE_PATH, sheet_name="Destinatarios")
+        df = pd.read_excel(ruta_excel, sheet_name="Destinatarios")
         df = df.fillna("")  # Rellenar valores nulos con cadenas vacías
         destinatarios = df.to_dict(orient="records")  # Convertir a lista de diccionarios
         
@@ -176,13 +177,13 @@ def buscar_contrato_en_excel(contrato_id):
     try:
         
         # Verificar si la hoja existe antes de abrirla
-        hojas_excel = pd.ExcelFile(EXCEL_FILE_PATH).sheet_names
+        hojas_excel = pd.ExcelFile(ruta_excel).sheet_names
         if año_contrato not in hojas_excel:
             print(f"⚠ Error: La hoja '{año_contrato}' no existe en el archivo Excel.")
             return None
         
         # Leer la hoja correspondiente al año del contrato
-        df = pd.read_excel(EXCEL_FILE_PATH, sheet_name=año_contrato)
+        df = pd.read_excel(ruta_excel, sheet_name=año_contrato)
         df = df.fillna("")  # Reemplazar valores nulos con cadenas vacías
 
         resultado = df[df["CONTRATO"] == contrato_id]
@@ -213,7 +214,7 @@ def buscar_contrato_en_excel(contrato_id):
             # Extraer información del RFC desde la hoja "RFC"
               
             try:
-               df_rfc = pd.read_excel(EXCEL_FILE_PATH, sheet_name="RFC")
+               df_rfc = pd.read_excel(ruta_excel, sheet_name="RFC")
                
                
                if not df_rfc.empty:
@@ -229,7 +230,7 @@ def buscar_contrato_en_excel(contrato_id):
             # Verificar si el contrato es plurianual y extraer datos de la hoja "Plurianuales"
             if resultado_dict.get("PLURI", "").strip().upper() == "SI":
                 try:
-                    df_pluri = pd.read_excel(EXCEL_FILE_PATH, sheet_name="Plurianuales")
+                    df_pluri = pd.read_excel(ruta_excel, sheet_name="Plurianuales")
                     df_pluri = df_pluri.fillna("")
                     pluri_resultado = df_pluri[df_pluri["CONTRATO"] == contrato_id]
 
@@ -254,7 +255,7 @@ def generar_documento(tipo, datos_contrato, destinatario):
     """Genera un documento Word con datos comunes y específicos según el tipo de documento"""
     plantilla_path = os.path.join(settings.BASE_DIR, "contratos", "doc_templates", f"{tipo}.docx")
     output_filename = f"{tipo}_{datos_contrato['CONTRATO'].replace('/', '_')}.docx"
-    output_path = os.path.join(MEDIA_PATH, output_filename)
+    output_path = os.path.join(ruta_docs, output_filename)
     
     if not os.path.exists(plantilla_path):
         return None
@@ -292,7 +293,7 @@ def generar_documento(tipo, datos_contrato, destinatario):
 def buscar_contratos_por_proveedor(proveedor):
     """Busca contratos en el Excel filtrando por proveedor con coincidencia parcial."""
     
-    xl = pd.ExcelFile(EXCEL_FILE_PATH)
+    xl = pd.ExcelFile(ruta_excel)
     contratos = []
 
     for sheet_name in xl.sheet_names:

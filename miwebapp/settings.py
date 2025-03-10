@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,13 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vh$@+7r@1&od#e5qspl-v5ur8ceo!+0hc1_(ghs*28u+!z-xc+'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
-DEBUG = os.getenv("DEBUG", "False") == "True"  # Cambia según el entorno
+#DEBUG = os.getenv("DEBUG", "False") == "True"  # Cambia según el entorno
+DEBUG = config('DEBUG', cast=bool, default=False)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(",")])
 
-ALLOWED_HOSTS = ['*']
+# EXCEL FILE PATH (para utils.py)
+EXCEL_FILE_PATH = config('EXCEL_FILE_PATH')
 
 
 # Application definition
@@ -122,8 +126,12 @@ MEDIA_URL = "/media/"
 #MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_ROOT = BASE_DIR / "media"
 
+# MEDIA PATH para los documentos generados
+MEDIA_FOLDER = config('MEDIA_FOLDER', default='DocsGenerados')
+
 # Ruta específica para almacenar los documentos generados
-MEDIA_PATH = os.path.join(MEDIA_ROOT, "DocsGenerados")  # ✅ Usa MEDIA_ROOT correctamente
+#MEDIA_PATH = os.path.join(MEDIA_ROOT, "DocsGenerados")  # ✅ Usa MEDIA_ROOT correctamente
+MEDIA_PATH = os.path.join(MEDIA_ROOT, MEDIA_FOLDER)
 
 # Configurar Whitenoise para servir `MEDIA_ROOT`
 if not DEBUG:
