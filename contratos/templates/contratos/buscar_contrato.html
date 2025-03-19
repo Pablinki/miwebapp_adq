@@ -9,32 +9,23 @@
     <script src="{% static 'js/script.js' %}" defer></script>  
 </head>
 <body>
-    
     <div class="container">
-        <!-- Formulario de búsqueda -->
         <div id="searchContainer">
-            <h1>Buscador de Contratos de la Dirección de Aquisiciones del Senado de la República</h1>
-            <!-- Formulario de búsqueda por contrato -->
+            <h1>Buscador de Contratos de la Dirección de Adquisiciones del Senado de la República</h1>
             <form id="searchForm" method="post">
                 {% csrf_token %}
-                <label for="id_contrato">Número de Contrato:</label>
+                <label for="id_contrato">Número de Contrato o Proveedor:</label>
                 {{ form.contrato }}
+                <label for="anio">Año (opcional):</label>
+                <input type="text" id="anio" name="anio">
+                <label><input type="checkbox" name="ver_convenios"> Mostrar Convenios</label>
                 <button type="submit">Buscar</button>
                 <button type="button" onclick="clearForm()">Limpiar</button>
             </form>
-            
-            <!-- Formulario de búsqueda por proveedor -->
-            <form id="searchProveedorForm" method="post" action="{% url 'buscar_por_proveedor' %}">
-                {% csrf_token %}
-                <label for="id_proveedor">Empresa / Proveedor:</label>
-                {{ form.proveedor }}
-                <button type="submit">Buscar</button>
-            </form>
         </div>
-        
-        <div class="result-container" {% if not resultado and not contratos_multiples %}style="display: none;"{% endif %}>
+
+        <div class="result-container" {% if not resultado and not contratos %}style="display: none;"{% endif %}>
             {% if resultado %}
-            
                 <h2>Detalles del Contrato</h2>
                 <div id="destinatarioContainer">
                     <h3>Seleccione un destinatario para generar el oficio:</h3>
@@ -46,44 +37,34 @@
                             <option value="">No hay destinatarios disponibles</option>
                         {% endfor %}
                     </select>
-
                     <p id="destinatarioInfo"></p>
                     <p id="cargoInfo" style="font-style: italic;"></p>
-                    <p id="errorDestinatario" style="color: red; display: none;"></p> <!-- Mensaje de error -->
-                    
                     <div id="generarOficioButtons">
                         <button onclick="generarDocumento('firma_administrador', '{{ resultado.CONTRATO }}')">Generar Oficio Firma Adm</button>
                         <button onclick="generarDocumento('poliza', '{{ resultado.CONTRATO }}')">Generar Oficio Póliza</button>
+                        <button onclick="generarDocumento('nuevo_documento', '{{ resultado.CONTRATO }}')">Generar Nuevo Documento</button>
                     </div>
-                </div>  
-                
+                </div>
                 <div id="downloadLinks"></div>
 
                 <ul class="sin-bullets">
                     <li><strong>Contrato:</strong> {{ resultado.CONTRATO }}</li>
                     <li><strong>Proveedor:</strong> {{ resultado.PROVEEDOR }}</li>
                     <li><strong>Descripción:</strong> {{ resultado.DESCRIPCIÓN }}</li>
-
                     {% if resultado.RFC and resultado.RFC != "N/A" and resultado.RFC != "Error en Excel" %}
                         <li><strong>RFC del Proveedor:</strong> {{ resultado.RFC }}</li>
                     {% else %}
                         <li style="color: red;"><strong>RFC del Proveedor:</strong> No disponible</li>
                     {% endif %}
-
                     {% if resultado.TOTAL_MIN != "N/A" %}
                         <li><strong>Total Min:</strong> {{ resultado.TOTAL_MIN }}</li>
                     {% endif %}
-                    
                     {% if resultado.TOTAL_MAX != "N/A" %}
-                        <li><strong>Monto:</strong> {{ resultado.TOTAL_MAX }}</li>
+                        <li><strong>Total Max:</strong> {{ resultado.TOTAL_MAX }}</li>
                     {% endif %}
                 </ul>
-                
-                 
 
-                <!-- Botón para mostrar detalles de la póliza -->
-                <button id="polizaButton" onclick="toggleSection('polizaDetails', 'polizaButton')">Ver Detalles del Contrato</button>
-                <div id="polizaDetails" style="display: none;">
+                <div id="polizaDetails">
                     <h3>Vigencias:</h3>
                     <ul class="sin-bullets">
                         <li><strong>Fecha de Inicio:</strong> {{ resultado.FECHA_INICIO }}</li>
@@ -91,41 +72,19 @@
                         <li><strong>Observaciones:</strong> {{ resultado.OBSERVACIONES }}</li>
                     </ul>
 
-                    <!-- Nueva Sección: Montos en Dinero -->
                     <h3>Porcentajes en Cantidad ($):</h3>
                     <ul class="sin-bullets">
-                        <li><strong>Fianza de Cumplimiento:</strong> 
-                            <span style="{% if resultado.FIANZA_DE_CUMPLIMIENTO == 'NO APLICA' %}color: red;{% endif %}">
-                                {{ resultado.FIANZA_DE_CUMPLIMIENTO }}
-                            </span>
-                        </li>
-                        <li><strong>Póliza de Responsabilidad Civil:</strong> 
-                            <span style="{% if resultado.POLIZA_DE_RESPONSABILIDAD_CIVIL == 'NO APLICA' %}color: red;{% endif %}">
-                                {{ resultado.POLIZA_DE_RESPONSABILIDAD_CIVIL }}
-                            </span>
-                        </li>
-                        <li><strong>Vicios Ocultos:</strong> 
-                            <span style="{% if resultado.VICIOS_OCULTOS == 'NO APLICA' %}color: red;{% endif %}">
-                                {{ resultado.VICIOS_OCULTOS }}
-                            </span>
-                        </li>
-                        <li><strong>Fianza de Anticipo:</strong> 
-                            <span style="{% if resultado.FIANZA_DE_ANTICIPO == 'NO APLICA' %}color: red;{% endif %}">
-                                {{ resultado.FIANZA_DE_ANTICIPO }}
-                            </span>
-                        </li>
-                        <li><strong>REPSE:</strong> 
-                            <span style="{% if resultado.REPSE == 'NO APLICA' %}color: red;{% endif %}">
-                                {{ resultado.REPSE }}
-                            </span>
-                        </li>
+                        <li><strong>Fianza de Cumplimiento:</strong> <span style="{% if resultado.FIANZA_DE_CUMPLIMIENTO == 'NO APLICA' %}color: red;{% endif %}">{{ resultado.FIANZA_DE_CUMPLIMIENTO }}</span></li>
+                        <li><strong>Póliza de Responsabilidad Civil:</strong> <span style="{% if resultado.POLIZA_DE_RESPONSABILIDAD_CIVIL == 'NO APLICA' %}color: red;{% endif %}">{{ resultado.POLIZA_DE_RESPONSABILIDAD_CIVIL }}</span></li>
+                        <li><strong>Vicios Ocultos:</strong> <span style="{% if resultado.VICIOS_OCULTOS == 'NO APLICA' %}color: red;{% endif %}">{{ resultado.VICIOS_OCULTOS }}</span></li>
+                        <li><strong>Fianza de Anticipo:</strong> <span style="{% if resultado.FIANZA_DE_ANTICIPO == 'NO APLICA' %}color: red;{% endif %}">{{ resultado.FIANZA_DE_ANTICIPO }}</span></li>
+                        <li><strong>REPSE:</strong> <span style="{% if resultado.REPSE == 'NO APLICA' %}color: red;{% endif %}">{{ resultado.REPSE }}</span></li>
                     </ul>
                 </div>
 
                 {% if plurianual_info %}
                     <h3 style="color: green;">✅ Es plurianual</h3>
                     <button id="pluriButton" onclick="toggleSection('plurianualDetails', 'pluriButton')">Ver Detalle Plurianual</button>
-
                     <div id="plurianualDetails" style="display: none;">
                         <h3>Detalles del Plurianual</h3>
                         <ul class="sin-bullets">
@@ -136,8 +95,28 @@
                         </ul>
                     </div>
                 {% endif %}
+            {% elif contratos %}
+                <h2>Contratos Encontrados para el Proveedor</h2>
+                <ul class="sin-bullets">
+                    {% for contrato in contratos %}
+                        <li>
+                            <strong>Contrato:</strong> {{ contrato.CONTRATO }} - 
+                            <button onclick="detallesContrato('{{ contrato.CONTRATO }}')">Ver Detalles</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% elif convenios_resultados %}
+                <h2>Convenios Encontrados</h2>
+                <ul class="sin-bullets">
+                    {% for convenio in convenios_resultados %}
+                        <li>
+                            <strong>Convenio:</strong> {{ convenio.CONTRATO }} - 
+                            <button onclick="detallesContrato('{{ convenio.CONTRATO }}')">Ver Detalles</button>
+                        </li>
+                    {% endfor %}
+                </ul>
             {% else %}
-                <p>No se encontró el contrato.</p>
+                <p>No se encontró el contrato o proveedor.</p>
             {% endif %}
         </div>
     </div>
