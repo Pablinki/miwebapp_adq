@@ -5,28 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscador de Contratos</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'contratos/styles.css' %}">
-    <script src="{% static 'js/script.js' %}" defer></script>  
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <script src="{% static js/script.js' %}" defer></script>  
 </head>
 <body>
 
-    {% if resultados %}
-    <h2>Resultados de la Búsqueda por Proveedor</h2>
-    <ul>
-        {% for contrato in resultados %}
-            <li>
-                <strong>Contrato:</strong> {{ contrato.contrato }} <br>
-                <strong>Proveedor:</strong> {{ contrato.proveedor }} <br>
-                <strong>Descripción:</strong> {{ contrato.descripcion }} <br>
-                <a href="{% url 'buscar_contrato' %}?contrato={{ contrato.contrato }}">
-                    <button>Ver Detalles</button>
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No se encontraron contratos para este proveedor.</p>
-{% endif %}
+    <div class="container">
+
+        {% if resultados %}
+            <h2>Resultados de la Búsqueda por Proveedor</h2>
+
+            <div class="result-container">
+                {% for contrato in resultados %}
+                    <article class="contrato-item">
+                        <h3>Contrato: {{ contrato.CONTRATO }}</h3>
+                        <p><strong>Proveedor:</strong> {{ contrato.PROVEEDOR }}</p>
+                        <p><strong>Descripción:</strong> {{ contrato.DESCRIPCION }}</p>
+
+                        <a href="{% url 'buscar_contrato' %}?contrato={{ contrato.CONTRATO }}">
+                            <button>Ver Detalles</button>
+                        </a>
+
+                        <hr>
+                    </article>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <p>No se encontraron contratos para este proveedor.</p>
+        {% endif %}
+
+    </div>
 
 </body>
 </html>

@@ -37,8 +37,10 @@ def obtener_fecha_hoy():
 
 def formatear_moneda(valor):
     try:
+        valor = safe_float(valor, 0)
         return f"${float(valor):,.2f}" if valor not in ["", "N/A"] else "N/A"
-    except ValueError:
+    except Exception as e:
+        print(f"❗ Error al formatear moneda: {e}")
         return "N/A"
 
 # ✅ LIMPIEZA DE NOMBRES Y RFC
@@ -72,46 +74,78 @@ def obtener_destinatarios():
     except Exception:
         return []
 
+
+def safe_float(value, default=0):
+    try:
+        if value is None or value == "":
+            return default
+        return float(value)
+    except Exception as e:
+        print(f"❗ Error en safe_float con valor {value}: {e}")
+        return default
+
+
 # ✅ BÚSQUEDAS
 def buscar_contrato_en_excel(contrato_id):
     año_contrato = extraer_año_contrato(contrato_id)
+    print("📅 Año detectado:", año_contrato)
     if not año_contrato:
+        print("❌ Año no detectado.")
         return None
 
     try:
         hojas_excel = pd.ExcelFile(ruta_excel).sheet_names
+        print("📋 Hojas disponibles:", hojas_excel)
         if año_contrato not in hojas_excel:
+            print(f"❌ Hoja '{año_contrato}' no encontrada.")
             return None
 
         df = pd.read_excel(ruta_excel, sheet_name=año_contrato).fillna("")
+        print(f"📑 {año_contrato}: {len(df)} registros cargados")
         resultado = df[df["CONTRATO"] == contrato_id]
+        print("🔍 Filtrado por contrato:", resultado)
 
         if resultado.empty:
+            print("❌ No se encontró el contrato en el DataFrame.")
             return None
 
         row = resultado.iloc[0]
         resultado_dict = row.to_dict()
+        
+        print("📝 Resultado dict inicial:", resultado_dict)
+        
+        try:
 
-        resultado_dict.update({
-            "IMPORTE_MAX_SIN_IVA": formatear_moneda(row.get("IMPORTE MAXIMO (SIN IVA)")),
-            "IVA": formatear_moneda(row.get("IVA")),
-            "TOTAL_MAX": formatear_moneda(row.get("TOTAL MAXIMO")),
-            "IMPORTE_MIN_SIN_IVA": formatear_moneda(row.get("IMPORTE MÍNIMO (SIN IVA)")),
-            "IVA2": formatear_moneda(row.get("IVA2")),
-            "TOTAL_MIN": formatear_moneda(row.get("TOTAL MINIMO")),
-            "FECHA_INICIO": formatear_fecha(row.get("INICIO DE VIGENCIA")),
-            "FECHA_FIN": formatear_fecha(row.get("FIN DE VIGENCIA")),
-            "OBSERVACIONES": row.get("OBSERVACIONES", "N/A"),
-        })
-
-        total_maximo = float(row.get("TOTAL MAXIMO", 0)) or 0
-        resultado_dict.update({
-            "FIANZA_DE_CUMPLIMIENTO": calcular_monto(row.get("FIANZA DE CUMPLIMIENTO"), total_maximo),
-            "POLIZA_DE_RESPONSABILIDAD_CIVIL": calcular_monto(row.get("POLIZA DE RESPONSABILIDAD CIVIL"), total_maximo),
-            "VICIOS_OCULTOS": calcular_monto(row.get("VICIOS OCULTOS"), total_maximo),
-            "FIANZA_DE_ANTICIPO": calcular_monto(row.get("FIANZA DE ANTICIPO"), total_maximo),
-            "REPSE": calcular_monto(row.get("REPSE"), total_maximo)
-        })
+            resultado_dict.update({
+                "IMPORTE_MAX_SIN_IVA": formatear_moneda(row.get("IMPORTE MAXIMO (SIN IVA)")),
+                "IVA": formatear_moneda(row.get("IVA")),
+                "TOTAL_MAX": formatear_moneda(row.get("TOTAL MAXIMO")),
+                "IMPORTE_MIN_SIN_IVA": formatear_moneda(row.get("IMPORTE MÍNIMO (SIN IVA)")),
+                "IVA2": formatear_moneda(row.get("IVA2")),
+                "TOTAL_MIN": formatear_moneda(row.get("TOTAL MINIMO")),
+                "FECHA_INICIO": formatear_fecha(row.get("INICIO DE VIGENCIA")),
+                "FECHA_FIN": formatear_fecha(row.get("FIN DE VIGENCIA")),
+                "OBSERVACIONES": row.get("OBSERVACIONES", "N/A"),
+            })
+    
+            try:
+                total_maximo = safe_float(row.get("TOTAL MAXIMO", 0))
+            except Exception as e:
+                print("❗ Error en total_maximo:", e)
+                total_maximo = 0
+            
+            
+            
+            resultado_dict.update({
+                "FIANZA_DE_CUMPLIMIENTO": calcular_monto(row.get("FIANZA DE CUMPLIMIENTO"), total_maximo),
+                "POLIZA_DE_RESPONSABILIDAD_CIVIL": calcular_monto(row.get("POLIZA DE RESPONSABILIDAD CIVIL"), total_maximo),
+                "VICIOS_OCULTOS": calcular_monto(row.get("VICIOS OCULTOS"), total_maximo),
+                "FIANZA_DE_ANTICIPO": calcular_monto(row.get("FIANZA DE ANTICIPO"), total_maximo),
+                "REPSE": calcular_monto(row.get("REPSE"), total_maximo)
+            })
+        except Exception as e:
+            print(f"❗ Error al actualizar resultado_dict: {e}")
+            return None
 
         try:
             df_rfc = pd.read_excel(ruta_excel, sheet_name="RFC")
@@ -127,9 +161,10 @@ def buscar_contrato_en_excel(contrato_id):
                     resultado_dict["PLURIANUAL_INFO"] = pluri_resultado.iloc[0].to_dict()
             except Exception:
                 pass
-
+            
         return resultado_dict
-    except Exception:
+    except Exception as e:
+        print(f"❗ Error general en buscar_contrato_en_excel: {e}")
         return None
 
 def buscar_contratos_por_proveedor(proveedor, anio=None):
@@ -138,6 +173,9 @@ def buscar_contratos_por_proveedor(proveedor, anio=None):
 
     for sheet_name in xl.sheet_names:
         df = xl.parse(sheet_name).fillna("")
+        # Verificar que exista la columna 'PROVEEDOR'
+        if "PROVEEDOR" not in df.columns or "CONTRATO" not in df.columns:
+            continue  # saltar la hoja que no tiene la estructura correcta
         df_filtrado = df[df["PROVEEDOR"].str.contains(proveedor, case=False, na=False)]
         if anio:
             df_filtrado = df_filtrado[df_filtrado["CONTRATO"].str.contains(f"/{anio}")]
@@ -156,6 +194,12 @@ def buscar_convenios(proveedor, anio=None):
 
     for sheet_name in xl.sheet_names:
         df = xl.parse(sheet_name).fillna("")
+        df.columns = df.columns.str.strip().str.upper()
+        if "PROVEEDOR" not in df.columns or "CONTRATO" not in df.columns:
+            # Saltamos hojas que no tengan la columna correcta
+            print(f"❌ La hoja '{sheet_name}' NO contiene la columna 'PROVEEDOR'")
+            continue
+        
         df_filtrado = df[
             (df["PROVEEDOR"].str.contains(proveedor, case=False, na=False)) &
             (df["CONTRATO"].str.contains(r'-[IVXLCDM]+/', na=False))
@@ -218,9 +262,7 @@ def generar_documento(tipo, datos_contrato, destinatario):
         reemplazos["{INICIO_VIGENCIA}"] = datos_contrato.get("FECHA_INICIO", "N/A")
         reemplazos["{FIN_VIGENCIA}"] = datos_contrato.get("FECHA_FIN", "N/A")
 
-    if tipo == "nuevo_documento":
-        reemplazos["{EXTRA_CAMPO}"] = datos_contrato.get("EXTRA_CAMPO", "N/A")
-
+    
     for p in doc.paragraphs:
         for key, value in reemplazos.items():
             p.text = p.text.replace(key, str(value))

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscador de Contratos</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'contratos/styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
     <script src="{% static 'js/script.js' %}" defer></script>  
 </head>
 <body>
@@ -16,9 +16,10 @@
                 {% csrf_token %}
                 <label for="id_contrato">Número de Contrato o Proveedor:</label>
                 {{ form.contrato }}
+                
                 <label for="anio">Año (opcional):</label>
                 <input type="text" id="anio" name="anio">
-                <label><input type="checkbox" name="ver_convenios"> Mostrar Convenios</label>
+                <!--<label><input type="checkbox" name="ver_convenios"> Mostrar Convenios</label>-->
                 <button type="submit">Buscar</button>
                 <button type="button" onclick="clearForm()">Limpiar</button>
             </form>
@@ -42,8 +43,9 @@
                     <div id="generarOficioButtons">
                         <button onclick="generarDocumento('firma_administrador', '{{ resultado.CONTRATO }}')">Generar Oficio Firma Adm</button>
                         <button onclick="generarDocumento('poliza', '{{ resultado.CONTRATO }}')">Generar Oficio Póliza</button>
-                        <button onclick="generarDocumento('nuevo_documento', '{{ resultado.CONTRATO }}')">Generar Nuevo Documento</button>
+                        <button onclick="generarDocumento('garantias', '{{ resultado.CONTRATO }}')">Generar Oficio Garantías</button>
                     </div>
+                    <p id="errorDestinatario" style="color: red; display: none;"></p>
                 </div>
                 <div id="downloadLinks"></div>
 

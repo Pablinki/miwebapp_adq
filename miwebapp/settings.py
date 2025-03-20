@@ -90,6 +90,7 @@ MEDIA_PATH = os.path.join(MEDIA_ROOT, MEDIA_FOLDER)
 if not os.path.exists(MEDIA_PATH):
     os.makedirs(MEDIA_PATH)
 
+
 # STATIC FILES
 STATIC_URL = '/static/'
 

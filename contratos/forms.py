@@ -9,4 +9,4 @@ class BuscarProveedorForm(forms.Form):
         label="Empresa / Proveedor",
         max_length=100,
         required=False,
-        widget=forms.TextInput(attrs={"size":30}))
+        widget=forms.TextInput(attrs={"size":30,"id": "id_contrato"}))

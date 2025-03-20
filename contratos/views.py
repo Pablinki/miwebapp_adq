@@ -14,7 +14,51 @@ from .utils import (
     buscar_convenios
 )
 
-# --- Búsqueda principal por contrato/proveedor ---
+# # --- Búsqueda principal por contrato/proveedor ---
+# def buscar_contrato(request):
+#     resultado = None
+#     poliza_info = None
+#     plurianual_info = None
+#     convenios_resultados = []
+#     contratos = []
+#     destinatarios = obtener_destinatarios()
+
+#     if request.method == "POST":
+#         form = BuscarContratoForm(request.POST)
+#         if form.is_valid():
+#             query = form.cleaned_data["contrato"].strip()  # Entrada de usuario
+#             anio = request.POST.get("anio")                # Año extra si proveedor
+#             ver_convenios = request.POST.get("ver_convenios") == "on"
+
+#             if es_formato_contrato(query):
+#                 resultado = buscar_contrato_en_excel(query)
+
+#                 if resultado:
+#                     poliza_info = resultado.get("POLIZA_INFO", None)
+#                     plurianual_info = resultado.get("PLURIANUAL_INFO", None)
+
+#             else:
+#                 contratos = buscar_contratos_por_proveedor(query, anio)
+#                 contratos = [c for c in contratos if pd.notna(c.get("CONTRATO", None))]
+
+#                 if ver_convenios:
+#                     convenios_resultados = buscar_convenios(query, anio)
+
+#     else:
+#         form = BuscarContratoForm()
+
+#     contexto = {
+#         "form": form,
+#         "resultado": resultado,
+#         "contratos": contratos,
+#         "convenios_resultados": convenios_resultados,
+#         "destinatarios": destinatarios,
+#         "poliza_info": poliza_info,
+#         "plurianual_info": plurianual_info,
+#     }
+
+#     return render(request, "contratos/buscar_contrato.html", contexto)
+
 def buscar_contrato(request):
     resultado = None
     poliza_info = None
@@ -23,16 +67,37 @@ def buscar_contrato(request):
     contratos = []
     destinatarios = obtener_destinatarios()
 
-    if request.method == "POST":
+    form = BuscarContratoForm()
+
+    # --- Si es GET con contrato ---
+    contrato_id = request.GET.get("contrato")
+    if contrato_id:
+        contrato_id = contrato_id.strip()
+        print("🔍 Contrato ingresado:", contrato_id)
+
+        # Detectamos si es contrato o proveedor
+        if es_formato_contrato(contrato_id):
+            resultado = buscar_contrato_en_excel(contrato_id)
+            print("🔎 Resultado encontrado:", resultado)
+            if resultado:
+                poliza_info = resultado.get("POLIZA_INFO", None)
+                plurianual_info = resultado.get("PLURIANUAL_INFO", None)
+
+        else:
+            # Es un proveedor (poco común vía GET)
+            contratos = buscar_contratos_por_proveedor(contrato_id)
+            contratos = [c for c in contratos if pd.notna(c.get("CONTRATO", None))]
+
+    # --- Si es POST desde el formulario ---
+    elif request.method == "POST":
         form = BuscarContratoForm(request.POST)
         if form.is_valid():
-            query = form.cleaned_data["contrato"].strip()  # Entrada de usuario
-            anio = request.POST.get("anio")                # Año extra si proveedor
+            query = form.cleaned_data["contrato"].strip()
+            anio = request.POST.get("anio")
             ver_convenios = request.POST.get("ver_convenios") == "on"
 
             if es_formato_contrato(query):
                 resultado = buscar_contrato_en_excel(query)
-
                 if resultado:
                     poliza_info = resultado.get("POLIZA_INFO", None)
                     plurianual_info = resultado.get("PLURIANUAL_INFO", None)
@@ -44,9 +109,7 @@ def buscar_contrato(request):
                 if ver_convenios:
                     convenios_resultados = buscar_convenios(query, anio)
 
-    else:
-        form = BuscarContratoForm()
-
+    # --- Contexto Final ---
     contexto = {
         "form": form,
         "resultado": resultado,
@@ -59,6 +122,7 @@ def buscar_contrato(request):
 
     return render(request, "contratos/buscar_contrato.html", contexto)
 
+
 # --- Validación formato contrato/convenio ---
 def es_formato_contrato(query):
     import re
@@ -70,7 +134,7 @@ def es_formato_contrato(query):
 # --- Generar documentos (poliza / firma / nuevo_documento) ---
 def generar_documento_view(request):
     contrato_id = request.GET.get("contrato")
-    tipo = request.GET.get("tipo")  # 'poliza', 'firma_administrador', 'nuevo_documento'
+    tipo = request.GET.get("tipo")  # 'poliza', 'firma_administrador', 'garantias'
     destinatario_nombre = request.GET.get("destinatario")
 
     if not contrato_id or not tipo or not destinatario_nombre:
