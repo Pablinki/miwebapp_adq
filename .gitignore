@@ -25,6 +25,14 @@ venv.bak/
 db.sqlite3
 /media/
 /staticfiles/
+/staticfiles/*
+# Ignorar todos los archivos en staticfiles excepto los .gitkeep
+!/staticfiles/.gitkeep
+!/staticfiles/admin/.gitkeep
+!/staticfiles/contratos/.gitkeep
+!/staticfiles/js/.gitkeep
+
+
 static/
 local_settings.py
 secret_settings.py
