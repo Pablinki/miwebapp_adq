@@ -70,5 +70,6 @@ coverage.xml
 # Excel de bases de datos
 miwebapp/excel_reader/*.xlsx
 excel_reader/*.xlsx
+miwebapp/excel_reader/~$*.xlsx
 # Script JS personalizado (ignorar si lo editas localmente pero no quieres subirlo)
 contratos/static/js/script.js
