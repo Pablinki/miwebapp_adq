@@ -5,6 +5,7 @@ from django.conf import settings
 from datetime import datetime
 import re
 from rapidfuzz import process, fuzz
+from docx.shared import Pt
 
 ruta_excel = settings.EXCEL_FILE_PATH
 ruta_docs = settings.MEDIA_PATH
@@ -234,7 +235,7 @@ def calcular_monto(valor, total_maximo):
         return "NO APLICA"
 
 # ✅ GENERAR DOCUMENTOS
-def generar_documento(tipo, datos_contrato, destinatario):
+def generar_documento(tipo, datos_contrato, destinatario, ccp_lista=None):
     output_dir = os.path.join(settings.MEDIA_ROOT, "DocsGenerados")
     os.makedirs(output_dir, exist_ok=True)
 
@@ -262,10 +263,30 @@ def generar_documento(tipo, datos_contrato, destinatario):
         reemplazos["{INICIO_VIGENCIA}"] = datos_contrato.get("FECHA_INICIO", "N/A")
         reemplazos["{FIN_VIGENCIA}"] = datos_contrato.get("FECHA_FIN", "N/A")
 
-    
+    # C.C.P
+    ccp_texto = "\n".join([
+        f"{entry.split('||')[0].strip()}. {entry.split('||')[1].strip()}." for entry in ccp_lista]) if ccp_lista else ""
+
     for p in doc.paragraphs:
         for key, value in reemplazos.items():
             p.text = p.text.replace(key, str(value))
+        if "{C.C.P}" in p.text:
+            p.text = ""
+            par = p
+            run_label = par.add_run("C.c.p.-")
+            run_label.font.size = Pt(7)
+            run_label.font.name = "Calibri"
+            run_label.bold = False
+
+            if ccp_lista:
+                for idx, entry in enumerate(ccp_lista):
+                    nombre, cargo = entry.split("||")
+                    newline = doc.add_paragraph()
+                    newline.paragraph_format.space_after = Pt(0)
+                    run_entry = newline.add_run(f"{nombre.title().strip()}. {cargo.title().strip()}.")
+                    run_entry.font.size = Pt(7)
+                    run_entry.font.name = "Calibri"
+                    run_entry.bold = True
 
     doc.save(output_path)
     return f"{settings.MEDIA_URL}DocsGenerados/{output_filename}"

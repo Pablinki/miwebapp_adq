@@ -40,15 +40,34 @@
                     </select>
                     <p id="destinatarioInfo"></p>
                     <p id="cargoInfo" style="font-style: italic;"></p>
+                    <br>
+
+
                     <div id="generarOficioButtons">
-                        <button onclick="generarDocumento('firma_administrador', '{{ resultado.CONTRATO }}')">Generar Oficio Firma Adm</button>
-                        <button onclick="generarDocumento('poliza', '{{ resultado.CONTRATO }}')">Generar Oficio Póliza</button>
-                        <button onclick="generarDocumento('garantias', '{{ resultado.CONTRATO }}')">Generar Oficio Garantías</button>
+                        <button onclick="generarDocumento('firma_administrador', '{{ resultado.CONTRATO }}')">Oficio Formalización</button>
+                        <button onclick="generarDocumento('poliza', '{{ resultado.CONTRATO }}')">Oficio Poliza Responsabilidad Civil</button>
+                        <button onclick="generarDocumento('garantias', '{{ resultado.CONTRATO }}')">Oficio Requerimiento Garantías</button>
                     </div>
+                    <br>
                     <p id="errorDestinatario" style="color: red; display: none;"></p>
                 </div>
+                <br>
+                <div id="ccpContainer">
+                    <h4>Con Copia Para (C.C.P.):</h4>
+                    <br>
+                    <br>
+                    <div id="ccpList"></div>
+                    <select id="ccpSelect">
+                        <option value="">-- Seleccione destinatario --</option>
+                        {% for d in destinatarios %}
+                            <option value="{{ d.NOMBRE }}||{{ d.CARGO }}">{{ d.NOMBRE }} - {{ d.CARGO }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" onclick="agregarCcp()">+</button>
+                </div>
+                <br>
                 <div id="downloadLinks"></div>
-
+                <br>
                 <ul class="sin-bullets">
                     <li><strong>Contrato:</strong> {{ resultado.CONTRATO }}</li>
                     <li><strong>Proveedor:</strong> {{ resultado.PROVEEDOR }}</li>

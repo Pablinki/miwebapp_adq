@@ -93,13 +93,13 @@ if not os.path.exists(MEDIA_PATH):
 
 # STATIC FILES
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 if DEBUG:
     STATICFILES_DIRS = [
         BASE_DIR / "contratos" / "static",
     ]
 else:
-    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
     STATICFILES_DIRS = []
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
