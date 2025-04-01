@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscar Orden de Servicio</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h1>Buscar Orden de Servicio</h1>
+    <form method="post">
+      {% csrf_token %}
+      <label for="servicio">Número de Servicio:</label>
+      <input type="text" name="servicio" id="servicio">
+      <button type="submit">Buscar</button>
+    </form>
+
+    {% if resultados %}
+      <h2>Resultados</h2>
+      <ul class="sin-bullets">
+        {% for r in resultados %}
+          <li>
+            <strong>N° Servicio:</strong> {{ r."N° SERVICIO" }} |
+            <strong>Proveedor:</strong> {{ r.PROVEEDOR }} |
+            <strong>Área:</strong> {{ r."ÁREA SOLICITANTE" }} |
+            <strong>Descripción:</strong> {{ r.DESCRIPCIÓN }} |
+            <strong>Fecha Orden:</strong> {{ r."FECHA DE LA ORDEN" }} |
+            <strong>Firma Proveedor:</strong> {{ r."FIRMA PROVEED." }} |
+            <strong>Enviado a Admin:</strong> {{ r."SE ENVIA A FIRMA DEL ADMIN." }} |
+            <strong>Regresado Admin:</strong> {{ r."REGRESAN CON FIRMA DEL ADMIN." }} |
+            <strong>Formalización Real:</strong> {{ r."FECHA FORMALIZACIÓN (REAL)" }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</body>
+</html>

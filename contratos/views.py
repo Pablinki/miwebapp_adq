@@ -11,53 +11,24 @@ from .utils import (
     generar_documento,
     obtener_destinatarios,
     buscar_contratos_por_proveedor,
-    buscar_convenios
+    buscar_convenios, buscar_pedido_en_excel
 )
 
-# # --- Búsqueda principal por contrato/proveedor ---
-# def buscar_contrato(request):
-#     resultado = None
-#     poliza_info = None
-#     plurianual_info = None
-#     convenios_resultados = []
-#     contratos = []
-#     destinatarios = obtener_destinatarios()
+def buscar_pedido(request):
+    resultados = []
+    if request.method == "POST":
+        numero = request.POST.get("pedido", "").strip()
+        if numero:
+            resultados = buscar_pedido_en_excel(numero)
+    return render(request, "contratos/buscar_pedido.html", {"resultados": resultados})
 
-#     if request.method == "POST":
-#         form = BuscarContratoForm(request.POST)
-#         if form.is_valid():
-#             query = form.cleaned_data["contrato"].strip()  # Entrada de usuario
-#             anio = request.POST.get("anio")                # Año extra si proveedor
-#             ver_convenios = request.POST.get("ver_convenios") == "on"
-
-#             if es_formato_contrato(query):
-#                 resultado = buscar_contrato_en_excel(query)
-
-#                 if resultado:
-#                     poliza_info = resultado.get("POLIZA_INFO", None)
-#                     plurianual_info = resultado.get("PLURIANUAL_INFO", None)
-
-#             else:
-#                 contratos = buscar_contratos_por_proveedor(query, anio)
-#                 contratos = [c for c in contratos if pd.notna(c.get("CONTRATO", None))]
-
-#                 if ver_convenios:
-#                     convenios_resultados = buscar_convenios(query, anio)
-
-#     else:
-#         form = BuscarContratoForm()
-
-#     contexto = {
-#         "form": form,
-#         "resultado": resultado,
-#         "contratos": contratos,
-#         "convenios_resultados": convenios_resultados,
-#         "destinatarios": destinatarios,
-#         "poliza_info": poliza_info,
-#         "plurianual_info": plurianual_info,
-#     }
-
-#     return render(request, "contratos/buscar_contrato.html", contexto)
+def buscar_orden(request):
+    resultados = []
+    if request.method == "POST":
+        numero = request.POST.get("servicio", "").strip()
+        if numero:
+            resultados = buscar_orden_en_excel(numero)
+    return render(request, "contratos/buscar_orden.html", {"resultados": resultados})
 
 def buscar_contrato(request):
     resultado = None
@@ -126,10 +97,28 @@ def buscar_contrato(request):
 # --- Validación formato contrato/convenio ---
 def es_formato_contrato(query):
     import re
-    contrato_pattern = r'^[A-Z]+/DGRMSG/\d+/\d+/\d{4}$'
-    convenio_pattern = r'^[A-Z]+/DGRMSG/\d+-[IVXLCDM]+/\d+/\d{2}$'
+    query = query.strip()
 
-    return bool(re.match(contrato_pattern, query) or re.match(convenio_pattern, query))
+    # Validar caracteres sospechosos
+    if len(query) < 10 or not re.match(r'^[\w\s\-\/]+$', query):
+        return False
+
+    # Contratos: SERV/DGRMSG/120/09/20 o .../2023
+    contrato_normal = r"^[A-Z]+/DGRMSG/\d+/\d+/\d{2,4}$"
+
+    # Convenios: ADQ/DGRMSG/038-I/03/21 ó SERV/DGRMSG/2024/01/003-I
+    convenio_con_guion = r"^[A-Z]+/DGRMSG/\d+(-[IVXLCDM]+)?/\d+/\d{2,4}$"
+    convenio_alt = r"^[A-Z]+/DGRMSG/\d+/\d+/\d{2,4}(-[IVXLCDM]+)?$"
+
+    # Opcionalmente contener texto extra como "Convenio de Terminación"
+    texto_extra = r"^[A-Z]+/DGRMSG/\d+(-[IVXLCDM]+)?/\d+/\d{2,4}.*$"
+
+    return any([
+        re.match(contrato_normal, query),
+        re.match(convenio_con_guion, query),
+        re.match(convenio_alt, query),
+        re.match(texto_extra, query)
+    ])
 
 # --- Generar documentos (poliza / firma / nuevo_documento) ---
 def generar_documento_view(request):

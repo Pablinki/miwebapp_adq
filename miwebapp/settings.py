@@ -13,6 +13,9 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.spl
 # EXCEL FILE PATH
 EXCEL_FILE_PATH = config('EXCEL_FILE_PATH')
 
+EXCEL_PEDIDOS_PATH = config('EXCEL_PEDIDOS_PATH')
+
+
 # APLICACIONES
 INSTALLED_APPS = [
     'django.contrib.admin',
