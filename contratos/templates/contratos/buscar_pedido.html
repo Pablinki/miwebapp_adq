@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Pedidos</title>
 </head>
 <body>
+    {% load custom_filters %}
+
     {% extends "base.html" %}  {# si usas layout base, si no, copia desde buscar_contrato.html #}
     {% block content %}
     <h1>Buscar Pedido</h1>
@@ -20,15 +22,15 @@
         <ul class="sin-bullets">
             {% for r in resultados %}
                 <li>
-                    <strong>N° Servicio:</strong> {{ r."N° SERVICIO" }} |
-                    <strong>Proveedor:</strong> {{ r.PROVEEDOR }} |
-                    <strong>Área Solicitante:</strong> {{ r."ÁREA SOLICITANTE" }} |
-                    <strong>Descripción:</strong> {{ r.DESCRIPCIÓN }} |
-                    <strong>Fecha de la Orden:</strong> {{ r."FECHA DE LA ORDEN" }} |
-                    <strong>Firma del Proveedor:</strong> {{ r."FIRMA PROVEED." }} |
-                    <strong>Enviado a Admin:</strong> {{ r."SE ENVIA A FIRMA DEL ADMIN." }} |
-                    <strong>Regresado de Admin:</strong> {{ r."REGRESAN CON FIRMA DEL ADMIN." }} |
-                    <strong>Formalización Real:</strong> {{ r."FECHA FORMALIZACIÓN (REAL)" }}
+                    <strong>N° Servicio:</strong>  {{ r|get_item:"N° SERVICIO" }} |
+            <strong>Proveedor:</strong> {{ r|get_item:"PROVEEDOR" }} |
+            <strong>Área Solicitante:</strong> {{ r|get_item:"ÁREA SOLICITANTE" }} |
+            <strong>Descripción:</strong> {{ r|get_item:"DESCRIPCIÓN" }} |
+            <strong>Fecha de la Orden:</strong> {{ r|get_item:"FECHA DE LA ORDEN" }} |
+            <strong>Firma del Proveedor:</strong> {{ r|get_item:"FIRMA PROVEED." }} |
+            <strong>Enviado a Admin:</strong> {{ r|get_item:"SE ENVIA A FIRMA DEL ADMIN." }} |
+            <strong>Regresado de Admin:</strong> {{ r|get_item:"REGRESAN CON FIRMA DEL ADMIN." }} |
+            <strong>Formalización Real:</strong> {{ r|get_item:"FECHA FORMALIZACIÓN (REAL)" }}
                 </li>
             {% endfor %}
         </ul>
