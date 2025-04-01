@@ -9,6 +9,15 @@
     <script src="{% static 'js/script.js' %}" defer></script>  
 </head>
 <body>
+
+    <nav>
+        <ul class="menu">
+            <li><a href="{% url 'buscar_contrato' %}">Contratos</a></li>
+            <li><a href="{% url 'buscar_pedido' %}">Pedidos</a></li>
+            <li><a href="{% url 'buscar_orden' %}">Orden</a></li>
+        </ul>
+    </nav>
+
     <div class="container">
         <div id="searchContainer">
             <h1>Buscador de Contratos de la Dirección de Adquisiciones del Senado de la República</h1>
@@ -55,7 +64,7 @@
                 <div id="ccpContainer">
                     <h4>Con Copia Para (C.C.P.):</h4>
                     <br>
-                    <br>
+
                     <div id="ccpList"></div>
                     <select id="ccpSelect">
                         <option value="">-- Seleccione destinatario --</option>
@@ -66,7 +75,9 @@
                     <button type="button" onclick="agregarCcp()">+</button>
                 </div>
                 <br>
-                <div id="downloadLinks"></div>
+               <div id="loadingMessage" style="display: none; font-style: italic; color: gray; margin-top: 10px;">
+                   Generando documento, por favor espere...
+               </div>
                 <br>
                 <ul class="sin-bullets">
                     <li><strong>Contrato:</strong> {{ resultado.CONTRATO }}</li>
@@ -91,6 +102,17 @@
                         <li><strong>Fecha de Inicio:</strong> {{ resultado.FECHA_INICIO }}</li>
                         <li><strong>Fecha de Fin:</strong> {{ resultado.FECHA_FIN }}</li>
                         <li><strong>Observaciones:</strong> {{ resultado.OBSERVACIONES }}</li>
+                    </ul>
+
+                    <h3>Ruta de Firma y Formalización</h3>
+                    <ul class="sin-bullets">
+                        <li><strong>Firma del Proveedor:</strong> {{ resultado.FIRMA_PROVEEDOR }}</li>
+                        <li><strong>Enviado a Firma del Administrador:</strong> {{ resultado.ENVIO_FIRMA_ADMIN }}</li>
+                        <li><strong>Devuelto por el Administrador:</strong> {{ resultado.DEVUELTO_ADMIN }}</li>
+                        <li><strong>Enviado a Firma del D.G.:</strong> {{ resultado.ENVIO_DG }}</li>
+                        <li><strong>Devuelto por el D.G.:</strong> {{ resultado.DEVUELTO_DG }}</li>
+                        <li><strong>Fecha Formalización Tesorería o Contrato:</strong> {{ resultado.FECHA_FORMALIZACION_TESO }}</li>
+                        <li><strong>Área Solicitante:</strong> {{ resultado.AREA_SOLICITANTE }}</li>
                     </ul>
 
                     <h3>Porcentajes en Cantidad ($):</h3>

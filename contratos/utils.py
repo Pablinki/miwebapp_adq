@@ -103,7 +103,7 @@ def buscar_contrato_en_excel(contrato_id):
 
         df = pd.read_excel(ruta_excel, sheet_name=año_contrato).fillna("")
         print(f"📑 {año_contrato}: {len(df)} registros cargados")
-        resultado = df[df["CONTRATO"] == contrato_id]
+        resultado = df[df["CONTRATO"].str.strip() == contrato_id.strip()]
         print("🔍 Filtrado por contrato:", resultado)
 
         if resultado.empty:
@@ -127,6 +127,13 @@ def buscar_contrato_en_excel(contrato_id):
                 "FECHA_INICIO": formatear_fecha(row.get("INICIO DE VIGENCIA")),
                 "FECHA_FIN": formatear_fecha(row.get("FIN DE VIGENCIA")),
                 "OBSERVACIONES": row.get("OBSERVACIONES", "N/A"),
+                "FIRMA_PROVEEDOR": formatear_fecha(row.get("FIRMA PROVEEDOR")),
+                "ENVIO_FIRMA_ADMIN": formatear_fecha(row.get("SE ENVIA A FIRMA DEL ADMINISTRADOR")),
+                "DEVUELTO_ADMIN": formatear_fecha(row.get("ENVÍAN DEL ADMINISTRADOR EL CONTRATO")),
+                "ENVIO_DG": formatear_fecha(row.get("SE ENVIA A FIRMA DEL DIRECTOR GENERAL")),
+                "DEVUELTO_DG": formatear_fecha(row.get("ENVÍAN DE D.G. EL CONTRATO")),
+                "FECHA_FORMALIZACION_TESO": formatear_fecha(row.get("FECHA DE FORMALIZACIÓN DE FIANZA EN TESORERÍA y/o CONTRATO")),
+                "AREA_SOLICITANTE": row.get("AREA SOLICITANTE", "N/A"),
             })
     
             try:
@@ -206,7 +213,8 @@ def buscar_convenios(proveedor, anio=None):
             (df["CONTRATO"].str.contains(r'-[IVXLCDM]+/', na=False))
         ]
         if anio:
-            df_filtrado = df_filtrado[df_filtrado["CONTRATO"].str.endswith(f"/{str(anio)[-2:]}")]
+            #df_filtrado = df_filtrado[df_filtrado["CONTRATO"].str.endswith(f"/{str(anio)[-2:]}")]
+            df_filtrado = df_filtrado[df_filtrado["CONTRATO"].str.contains(f"/{anio[-2:]}", na=False)]
         for _, row in df_filtrado.iterrows():
             convenios.append({
                 "CONTRATO": row["CONTRATO"],
@@ -290,3 +298,61 @@ def generar_documento(tipo, datos_contrato, destinatario, ccp_lista=None):
 
     doc.save(output_path)
     return f"{settings.MEDIA_URL}DocsGenerados/{output_filename}"
+
+def buscar_pedido_en_excel(numero_pedido):
+    try:
+        xl = pd.ExcelFile(settings.EXCEL_PEDIDOS_PATH)
+        if "PEDIDOS" not in xl.sheet_names:
+            print("❌ La hoja 'PEDIDOS' no está en el archivo.")
+            return []
+
+        df = xl.parse("PEDIDOS").fillna("")
+        df.columns = df.columns.str.strip().str.upper()
+        resultado = df[df["N° PEDIDO"].astype(str).str.strip() == numero_pedido]
+        if resultado.empty:
+            return []
+        return resultado[[
+            "N° SERVICIO",
+            "PROVEEDOR",
+            "ÁREA SOLICITANTE",
+            "DESCRIPCIÓN",
+            "FECHA DE LA ORDEN",
+            "FIRMA PROVEED.",
+            "SE ENVIA A FIRMA DEL ADMIN.",
+            "REGRESAN CON FIRMA DEL ADMIN.",
+            "FECHA FORMALIZACIÓN (REAL)"
+        ]].to_dict(orient="records")
+
+    except Exception as e:
+        print(f"❗ Error al buscar pedido: {e}")
+        return []
+
+def buscar_orden_en_excel(numero_servicio):
+    try:
+        xl = pd.ExcelFile(settings.EXCEL_PEDIDOS_PATH)
+        if "SERVICIOS" not in xl.sheet_names:
+            print("❌ La hoja 'SERVICIOS' no está en el archivo.")
+            return []
+
+        df = xl.parse("SERVICIOS").fillna("")
+        df.columns = df.columns.str.strip().str.upper()
+
+        resultado = df[df["N° SERVICIO"].astype(str).str.strip() == numero_servicio]
+        if resultado.empty:
+            return []
+
+        return resultado[[
+            "N° SERVICIO",
+            "PROVEEDOR",
+            "ÁREA SOLICITANTE",
+            "DESCRIPCIÓN",
+            "FECHA DE LA ORDEN",
+            "FIRMA PROVEED.",
+            "SE ENVIA A FIRMA DEL ADMIN.",
+            "REGRESAN CON FIRMA DEL ADMIN.",
+            "FECHA FORMALIZACIÓN (REAL)"
+        ]].to_dict(orient="records")
+
+    except Exception as e:
+        print(f"❗ Error al buscar orden: {e}")
+        return []
