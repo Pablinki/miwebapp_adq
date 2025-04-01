@@ -11,7 +11,7 @@ from .utils import (
     generar_documento,
     obtener_destinatarios,
     buscar_contratos_por_proveedor,
-    buscar_convenios, buscar_pedido_en_excel
+    buscar_convenios, buscar_pedido_en_excel, buscar_orden_en_excel
 )
 
 def buscar_pedido(request):
@@ -22,13 +22,17 @@ def buscar_pedido(request):
             resultados = buscar_pedido_en_excel(numero)
     return render(request, "contratos/buscar_pedido.html", {"resultados": resultados})
 
+
+
 def buscar_orden(request):
     resultados = []
-    if request.method == "POST":
-        numero = request.POST.get("servicio", "").strip()
-        if numero:
-            resultados = buscar_orden_en_excel(numero)
+    numero = request.GET.get("servicio", "").strip()
+
+    if numero:
+        resultados = buscar_orden_en_excel(numero)
+
     return render(request, "contratos/buscar_orden.html", {"resultados": resultados})
+
 
 def buscar_contrato(request):
     resultado = None
