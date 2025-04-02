@@ -1,42 +1,42 @@
+{% extends "contratos/buscar_contrato.html" %}
 {% load static %}
 {% load custom_filters %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Órdenes de Servicio</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <div class="container">
-        <h1>Buscar Órdenes de Servicio</h1>
-        <form method="get">
+{% block content %}
+<div class="container">
+    <div id="searchContainer">
+        <h1>Buscar Orden de Servicio</h1>
+        <form id="searchForm" method="get">
             <label for="orden">Número de Servicio:</label>
-            <input type="text" name="orden" id="orden">
-            <button type="submit">Buscar</button>
-        </form>
+            <input type="text" name="orden" id="orden" value="{{ request.GET.orden|default:'' }}" size="30">
 
+            <button type="submit">Buscar</button>
+            <button type="button" onclick="clearForm()">Limpiar</button>
+        </form>
+    </div>
+
+    <div class="result-container" {% if not resultados %}style="display:none;"{% endif %}>
         {% if resultados %}
-            <h2>Resultados</h2>
+            <h2>Resultados de la Orden</h2>
             <ul class="sin-bullets">
                 {% for r in resultados %}
                     <li>
-                        <strong>N° Servicio:</strong> {{ r|get_item:"N° SERVICIO" }} |
-                        <strong>Proveedor:</strong> {{ r|get_item:"PROVEEDOR" }} |
-                        <strong>Área Solicitante:</strong> {{ r|get_item:"ÁREA SOLICITANTE" }} |
-                        <strong>Descripción:</strong> {{ r|get_item:"DESCRIPCIÓN" }} |
-                        <strong>Fecha de la Orden:</strong> {{ r|get_item:"FECHA DE LA ORDEN" }} |
-                        <strong>Firma del Proveedor:</strong> {{ r|get_item:"FIRMA PROVEED." }} |
-                        <strong>Enviado a Admin:</strong> {{ r|get_item:"SE ENVIA A FIRMA DEL ADMIN." }} |
-                        <strong>Regresado de Admin:</strong> {{ r|get_item:"REGRESAN CON FIRMA DEL ADMIN." }} |
-                        <strong>Formalización Real:</strong> {{ r|get_item:"FECHA FORMALIZACIÓN (REAL)" }}
+                        <strong>N° Servicio:</strong> {{ r|get_item:"N° SERVICIO" }}<br>
+                        <strong>Proveedor:</strong> {{ r|get_item:"PROVEEDOR" }}<br>
+                        <strong>Área Solicitante:</strong> {{ r|get_item:"ÁREA SOLICITANTE" }}<br>
+                        <strong>Descripción:</strong> {{ r|get_item:"DESCRIPCIÓN" }}<br>
+                        <strong>Fecha de la Orden:</strong> {{ r|get_item:"FECHA DE LA ORDEN"|quitar_hora }}<br>
+                        <strong>Firma del Proveedor:</strong> {{ r|get_item:"FIRMA PROVEED." |quitar_hora}}<br>
+                        <strong>Enviado a Admin:</strong> {{ r|get_item:"SE ENVIA A FIRMA DEL ADMIN."|quitar_hora }}<br>
+                        <strong>Regresado de Admin:</strong> {{ r|get_item:"REGRESAN CON FIRMA DEL ADMIN."|quitar_hora }}<br>
+                        <strong>Formalización Real:</strong> {{ r|get_item:"FECHA FORMALIZACIÓN (REAL)"|quitar_hora }}
                     </li>
+                    <br>
                 {% endfor %}
             </ul>
         {% else %}
-            <p>No se encontraron resultados.</p>
+            <p>No se encontraron resultados para la orden proporcionada.</p>
         {% endif %}
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

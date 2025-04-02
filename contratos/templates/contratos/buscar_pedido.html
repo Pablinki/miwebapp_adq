@@ -1,41 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Pedidos</title>
-</head>
-<body>
-    {% load custom_filters %}
+{% extends "contratos/buscar_contrato.html" %}
+{% load static %}
+{% load custom_filters %}
 
-    {% extends "base.html" %}  {# si usas layout base, si no, copia desde buscar_contrato.html #}
-    {% block content %}
-    <h1>Buscar Pedido</h1>
-    <form method="post">
-        {% csrf_token %}
-        <label for="pedido">Número de Pedido:</label>
-        <input type="text" name="pedido" id="pedido">
-        <button type="submit">Buscar</button>
-    </form>
+{% block content %}
+<div class="container">
+    <div id="searchContainer">
+        <h1>Buscar Pedido</h1>
+        <form id="searchForm" method="post">
+            {% csrf_token %}
+            <label for="pedido">Número de Pedido:</label>
+            <input type="text" name="pedido" id="pedido" value="{{ request.POST.pedido|default:'' }}" size="30">
 
-    {% if resultados %}
-        <h2>Resultados</h2>
-        <ul class="sin-bullets">
-            {% for r in resultados %}
-                <li>
-                    <strong>N° Servicio:</strong>  {{ r|get_item:"N° SERVICIO" }} |
-            <strong>Proveedor:</strong> {{ r|get_item:"PROVEEDOR" }} |
-            <strong>Área Solicitante:</strong> {{ r|get_item:"ÁREA SOLICITANTE" }} |
-            <strong>Descripción:</strong> {{ r|get_item:"DESCRIPCIÓN" }} |
-            <strong>Fecha de la Orden:</strong> {{ r|get_item:"FECHA DE LA ORDEN" }} |
-            <strong>Firma del Proveedor:</strong> {{ r|get_item:"FIRMA PROVEED." }} |
-            <strong>Enviado a Admin:</strong> {{ r|get_item:"SE ENVIA A FIRMA DEL ADMIN." }} |
-            <strong>Regresado de Admin:</strong> {{ r|get_item:"REGRESAN CON FIRMA DEL ADMIN." }} |
-            <strong>Formalización Real:</strong> {{ r|get_item:"FECHA FORMALIZACIÓN (REAL)" }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% endblock %}
+            <button type="submit">Buscar</button>
+            <button type="button" onclick="clearForm()">Limpiar</button>
+        </form>
+    </div>
 
-</body>
-</html>
+    <div class="result-container" {% if not resultados %}style="display:none;"{% endif %}>
+        {% if resultados %}
+            <h2>Resultados del Pedido</h2>
+            <ul class="sin-bullets">
+                {% for r in resultados %}
+                    <li>
+                        <strong>N° Pedido:</strong> {{ r|get_item:"N° PEDIDO" }}<br>
+                        <strong>Proveedor:</strong> {{ r|get_item:"PROVEEDOR" }}<br>
+                        <strong>Área Solicitante:</strong> {{ r|get_item:"ÁREA SOLICITANTE" }}<br>
+                        <strong>Descripción:</strong> {{ r|get_item:"DESCRIPCIÓN" }}<br>
+                        <strong>Fecha de la Orden:</strong> {{ r|get_item:"FECHA DE LA ORDEN"|quitar_hora }}<br>
+                        <strong>Firma del Proveedor:</strong> {{ r|get_item:"FIRMA PROVEED."|quitar_hora }}<br>
+                        <strong>Enviado a firma del Admin.:</strong> {{ r|get_item:"SE ENVIA A FIRMA DEL ADMIN." |quitar_hora}}<br>
+                        <strong>Regresan con firma del Admin.:</strong> {{ r|get_item:"REGRESAN CON FIRMA DEL ADMIN." |quitar_hora}}<br>
+                        <strong>Fecha Formalización (Real):</strong> {{ r|get_item:"FECHA FORMALIZACIÓN (REAL)" |quitar_hora}}
+                    </li>
+                    <br>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No se encontraron resultados para el pedido proporcionado.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

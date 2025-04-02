@@ -18,18 +18,25 @@ def buscar_pedido(request):
     resultados = []
     if request.method == "POST":
         numero = request.POST.get("pedido", "").strip()
+        print(f"🟡 Pedido buscado: {numero}")
+
         if numero:
             resultados = buscar_pedido_en_excel(numero)
+            print(f"✅ Resultados encontrados: {len(resultados)}")
+
     return render(request, "contratos/buscar_pedido.html", {"resultados": resultados})
 
 
 
 def buscar_orden(request):
     resultados = []
-    numero = request.GET.get("servicio", "").strip()
+    orden_servicio  = request.GET.get("orden", "").strip()
+    print(f"🟡 Servicio buscado: {orden_servicio }")
 
-    if numero:
-        resultados = buscar_orden_en_excel(numero)
+    if orden_servicio :
+
+        resultados = buscar_orden_en_excel(orden_servicio )
+        print(f"✅ Resultados encontrados: {len(resultados)}")
 
     return render(request, "contratos/buscar_orden.html", {"resultados": resultados})
 
