@@ -227,7 +227,8 @@ def buscar_convenios(proveedor, anio=None):
 def extraer_año_contrato(contrato_id):
     partes = contrato_id.split("/")
     for parte in partes:
-        if parte.isdigit() and parte in ["2020", "2021", "2022", "2023", "2024", "2025"]:
+        if parte.isdigit() and parte in ["2018","2019","2020", "2021", "2022", "2023", "2024", "2025"]:
+            print("El año que se extrae del contrato", parte)
             return parte
     return None
 
@@ -312,7 +313,7 @@ def buscar_pedido_en_excel(numero_pedido):
         if resultado.empty:
             return []
         return resultado[[
-            "N° SERVICIO",
+            "N° PEDIDO",
             "PROVEEDOR",
             "ÁREA SOLICITANTE",
             "DESCRIPCIÓN",
@@ -338,6 +339,7 @@ def buscar_orden_en_excel(numero_servicio):
         df.columns = df.columns.str.strip().str.upper()
 
         resultado = df[df["N° SERVICIO"].astype(str).str.strip() == numero_servicio]
+        print("El resultado de la busqueda de orden de servicio", resultado)
         if resultado.empty:
             return []
 

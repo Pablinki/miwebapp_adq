@@ -10,15 +10,17 @@
 </head>
 <body>
 
-    <nav>
+    <nav class="navbar">
         <ul class="menu">
             <li><a href="{% url 'buscar_contrato' %}">Contratos</a></li>
             <li><a href="{% url 'buscar_pedido' %}">Pedidos</a></li>
-            <li><a href="{% url 'buscar_orden' %}">Orden</a></li>
+            <li><a href="{% url 'buscar_orden' %}">Órdenes</a></li>
         </ul>
     </nav>
 
+
     <div class="container">
+        {% block content %}
         <div id="searchContainer">
             <h1>Buscador de Contratos de la Dirección de Adquisiciones del Senado de la República</h1>
             <form id="searchForm" method="post">
@@ -162,6 +164,7 @@
                 <p>No se encontró el contrato o proveedor.</p>
             {% endif %}
         </div>
+        {% endblock %}
     </div>
 </body>
 </html>
