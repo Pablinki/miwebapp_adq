@@ -36,7 +36,7 @@
             </form>
         </div>
 
-        <div class="result-container" {% if not resultado and not contratos %}style="display: none;"{% endif %}>
+        <div class="result-container" {% if not resultado and not contratos and not convenios_resultados %}style="display: none;"{% endif %}>
             {% if resultado %}
                 <h2>Detalles del Contrato</h2>
                 <div id="destinatarioContainer">
@@ -117,7 +117,7 @@
                         <li><strong>Área Solicitante:</strong> {{ resultado.AREA_SOLICITANTE }}</li>
                     </ul>
 
-                    <h3>Porcentajes en Cantidad ($):</h3>
+                    <h3>Información de Garantías:</h3>
                     <ul class="sin-bullets">
                         <li><strong>Fianza de Cumplimiento:</strong> <span style="{% if resultado.FIANZA_DE_CUMPLIMIENTO == 'NO APLICA' %}color: red;{% endif %}">{{ resultado.FIANZA_DE_CUMPLIMIENTO }}</span></li>
                         <li><strong>Póliza de Responsabilidad Civil:</strong> <span style="{% if resultado.POLIZA_DE_RESPONSABILIDAD_CIVIL == 'NO APLICA' %}color: red;{% endif %}">{{ resultado.POLIZA_DE_RESPONSABILIDAD_CIVIL }}</span></li>
@@ -164,6 +164,7 @@
                 <p>No se encontró el contrato o proveedor.</p>
             {% endif %}
         </div>
+        <p id="mensajeNoResultados" style="display: none; color: red; font-weight: bold;"></p>
         {% endblock %}
     </div>
 </body>

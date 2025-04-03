@@ -227,10 +227,17 @@ def buscar_convenios(proveedor, anio=None):
 def extraer_año_contrato(contrato_id):
     partes = contrato_id.split("/")
     for parte in partes:
-        if parte.isdigit() and parte in ["2018","2019","2020", "2021", "2022", "2023", "2024", "2025"]:
-            print("El año que se extrae del contrato", parte)
-            return parte
+        if parte.isdigit():
+            if len(parte) == 4 and parte in ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"]:
+                print("El año que se extrae del contrato (formato largo):", parte)
+                return parte
+            elif len(parte) == 2:
+                posible_año = "20" + parte
+                if posible_año in ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"]:
+                    print("El año que se extrae del contrato (formato corto):", posible_año)
+                    return posible_año
     return None
+
 
 def calcular_monto(valor, total_maximo):
     try:

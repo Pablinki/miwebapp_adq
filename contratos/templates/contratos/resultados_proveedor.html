@@ -15,7 +15,7 @@
         {% if resultados %}
             <h2>Resultados de la Búsqueda por Proveedor</h2>
 
-            <div class="result-container">
+            <div class="result-container" {% if not resultados %}style="display:none;"{% endif %}>
                 {% for contrato in resultados %}
                     <article class="contrato-item">
                         <h3>Contrato: {{ contrato.CONTRATO }}</h3>
@@ -36,6 +36,8 @@
         {% endif %}
 
     </div>
+    <p id="mensajeNoResultados" style="display: none; color: red; font-weight: bold;"></p>
+
 
 </body>
 </html>
