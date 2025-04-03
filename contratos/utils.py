@@ -309,7 +309,7 @@ def buscar_pedido_en_excel(numero_pedido):
 
         df = xl.parse("PEDIDOS").fillna("")
         df.columns = df.columns.str.strip().str.upper()
-        resultado = df[df["N° PEDIDO"].astype(str).str.strip() == numero_pedido]
+        resultado = df[df["N° PEDIDO"].astype(str).str.strip().str.upper() == numero_pedido.upper()]
         if resultado.empty:
             return []
         return resultado[[
@@ -338,7 +338,7 @@ def buscar_orden_en_excel(numero_servicio):
         df = xl.parse("SERVICIOS").fillna("")
         df.columns = df.columns.str.strip().str.upper()
 
-        resultado = df[df["N° SERVICIO"].astype(str).str.strip() == numero_servicio]
+        resultado = df[df["N° SERVICIO"].astype(str).str.strip().str.upper() == numero_servicio.upper()]
         print("El resultado de la busqueda de orden de servicio", resultado)
         if resultado.empty:
             return []
