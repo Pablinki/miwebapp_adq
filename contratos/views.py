@@ -141,8 +141,8 @@ def generar_documento_view(request):
         return JsonResponse({"error": "Faltan parámetros"}, status=400)
 
     destinatario_nombre = urllib.parse.unquote(destinatario_nombre).strip().upper()
-    ccp_raw = request.GET.get("ccp", "")
-    ccp_lista = [urllib.parse.unquote(c) for c in ccp_raw.split(",") if c]
+    ccp_lista = request.GET.getlist("ccp")
+    ccp_lista = [urllib.parse.unquote(c) for c in ccp_lista if c]
 
     resultado = buscar_contrato_en_excel(contrato_id)
 

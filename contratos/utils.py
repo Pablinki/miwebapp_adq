@@ -227,10 +227,17 @@ def buscar_convenios(proveedor, anio=None):
 def extraer_año_contrato(contrato_id):
     partes = contrato_id.split("/")
     for parte in partes:
-        if parte.isdigit() and parte in ["2018","2019","2020", "2021", "2022", "2023", "2024", "2025"]:
-            print("El año que se extrae del contrato", parte)
-            return parte
+        if parte.isdigit():
+            if len(parte) == 4 and parte in ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"]:
+                print("El año que se extrae del contrato (formato largo):", parte)
+                return parte
+            elif len(parte) == 2:
+                posible_año = "20" + parte
+                if posible_año in ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"]:
+                    print("El año que se extrae del contrato (formato corto):", posible_año)
+                    return posible_año
     return None
+
 
 def calcular_monto(valor, total_maximo):
     try:
@@ -309,7 +316,7 @@ def buscar_pedido_en_excel(numero_pedido):
 
         df = xl.parse("PEDIDOS").fillna("")
         df.columns = df.columns.str.strip().str.upper()
-        resultado = df[df["N° PEDIDO"].astype(str).str.strip() == numero_pedido]
+        resultado = df[df["N° PEDIDO"].astype(str).str.strip().str.upper() == numero_pedido.upper()]
         if resultado.empty:
             return []
         return resultado[[
@@ -338,7 +345,7 @@ def buscar_orden_en_excel(numero_servicio):
         df = xl.parse("SERVICIOS").fillna("")
         df.columns = df.columns.str.strip().str.upper()
 
-        resultado = df[df["N° SERVICIO"].astype(str).str.strip() == numero_servicio]
+        resultado = df[df["N° SERVICIO"].astype(str).str.strip().str.upper() == numero_servicio.upper()]
         print("El resultado de la busqueda de orden de servicio", resultado)
         if resultado.empty:
             return []
