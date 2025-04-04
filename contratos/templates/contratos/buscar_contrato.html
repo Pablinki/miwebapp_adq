@@ -27,6 +27,9 @@
                 {% csrf_token %}
                 <label for="id_contrato">Número de Contrato o Proveedor:</label>
                 {{ form.contrato }}
+                <small style="color: gray;">
+                    Puedes usar <code>*</code> como comodín (ej. <strong>*2023</strong>, <strong>ADQ*</strong>, <strong>*038*</strong>)
+                </small>
                 
                 <label for="anio">Año (opcional):</label>
                 <input type="text" id="anio" name="anio">

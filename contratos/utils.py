@@ -85,6 +85,32 @@ def safe_float(value, default=0):
         print(f"❗ Error en safe_float con valor {value}: {e}")
         return default
 
+def normalizar_busqueda(patron_usuario):
+    """
+    Convierte un patrón estilo comodín (con *, ?) a una expresión regular válida.
+    Ejemplos:
+        *gas   → .*gas
+        gas*   → gas.*
+        *gas*  → .*gas.*
+        g?s    → g.s
+    """
+    if not isinstance(patron_usuario, str):
+        return ".*"
+
+    patron_escapado = re.escape(patron_usuario)
+    patron_regex = patron_escapado.replace(r'\*', '.*').replace(r'\?', '.')
+    return patron_regex
+
+def buscar_con_regex_seguro(serie, patron):
+    """
+    Realiza búsqueda segura con expresiones regulares en una Serie de pandas.
+    Devuelve coincidencias o serie vacía si hay error.
+    """
+    try:
+        return serie.str.contains(patron, flags=re.IGNORECASE, regex=True, na=False)
+    except re.error as e:
+        print(f"❗ Error en expresión regular: {e}")
+        return pd.Series([False] * len(serie))  # Ninguna coincidencia
 
 # ✅ BÚSQUEDAS
 def buscar_contrato_en_excel(contrato_id):
@@ -103,7 +129,10 @@ def buscar_contrato_en_excel(contrato_id):
 
         df = pd.read_excel(ruta_excel, sheet_name=año_contrato).fillna("")
         print(f"📑 {año_contrato}: {len(df)} registros cargados")
-        resultado = df[df["CONTRATO"].str.strip() == contrato_id.strip()]
+        patron = normalizar_busqueda(contrato_id)
+        coincidencias = buscar_con_regex_seguro(df["CONTRATO"], patron)
+        resultado = df[coincidencias]
+
         print("🔍 Filtrado por contrato:", resultado)
 
         if resultado.empty:
@@ -184,7 +213,11 @@ def buscar_contratos_por_proveedor(proveedor, anio=None):
         # Verificar que exista la columna 'PROVEEDOR'
         if "PROVEEDOR" not in df.columns or "CONTRATO" not in df.columns:
             continue  # saltar la hoja que no tiene la estructura correcta
-        df_filtrado = df[df["PROVEEDOR"].str.contains(proveedor, case=False, na=False)]
+
+        patron = normalizar_busqueda(proveedor)
+        coincidencias = buscar_con_regex_seguro(df["PROVEEDOR"], patron)
+        df_filtrado = df[coincidencias]
+
         if anio:
             df_filtrado = df_filtrado[df_filtrado["CONTRATO"].str.contains(f"/{anio}")]
         for _, row in df_filtrado.iterrows():
