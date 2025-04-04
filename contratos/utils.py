@@ -128,10 +128,19 @@ def buscar_contrato_en_excel(contrato_id):
             return None
 
         df = pd.read_excel(ruta_excel, sheet_name=año_contrato).fillna("")
+        df["CONTRATO"] = df["CONTRATO"].astype(str).str.strip().str.upper()
+        contrato_id = contrato_id.upper()
+
         print(f"📑 {año_contrato}: {len(df)} registros cargados")
-        patron = normalizar_busqueda(contrato_id)
-        coincidencias = buscar_con_regex_seguro(df["CONTRATO"], patron)
-        resultado = df[coincidencias]
+
+        # Si contiene comodines, usar regex
+        if "*" in contrato_id or "?" in contrato_id:
+            patron = normalizar_busqueda(contrato_id)
+            coincidencias = buscar_con_regex_seguro(df["CONTRATO"], patron)
+            resultado = df[coincidencias]
+        else:
+            # Búsqueda exacta
+            resultado = df[df["CONTRATO"] == contrato_id]
 
         print("🔍 Filtrado por contrato:", resultado)
 
