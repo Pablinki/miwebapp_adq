@@ -9,6 +9,7 @@
         <form id="searchForm" method="post">
             {% csrf_token %}
             <label for="pedido">Número de Pedido:</label>
+            <input type="hidden" name="formFueEnviado" id="formFueEnviado" value="1">
             <input type="text" name="pedido" id="pedido" value="{{ request.POST.pedido|default:'' }}" size="30">
 
             <button type="submit">Buscar</button>

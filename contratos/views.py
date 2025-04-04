@@ -11,7 +11,7 @@ from .utils import (
     generar_documento,
     obtener_destinatarios,
     buscar_contratos_por_proveedor,
-    buscar_convenios, buscar_pedido_en_excel, buscar_orden_en_excel
+    buscar_convenios, buscar_pedido_en_excel, buscar_orden_en_excel, limpiar_nombre_proveedor
 )
 
 def buscar_pedido(request):
@@ -74,7 +74,7 @@ def buscar_contrato(request):
     elif request.method == "POST":
         form = BuscarContratoForm(request.POST)
         if form.is_valid():
-            query = form.cleaned_data["contrato"].strip()
+            query = form.cleaned_data["contrato"].strip().upper()
             anio = request.POST.get("anio")
             ver_convenios = request.POST.get("ver_convenios") == "on"
 
@@ -185,7 +185,8 @@ def buscar_por_proveedor(request):
     if request.method == "POST":
         form = BuscarProveedorForm(request.POST)
         if form.is_valid():
-            proveedor = form.cleaned_data["proveedor"]
+            proveedor = form.cleaned_data["proveedor"].strip()
+            proveedor = limpiar_nombre_proveedor(proveedor)
             resultados = buscar_contratos_por_proveedor(proveedor)
 
     else:
